@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Improved Animated Password Reveal</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #1e1e2f;
+      color: #fff;
+    }
+
+    .password-container {
+      position: relative;
+      width: 300px;
+    }
+
+    input[type="password"], input[type="text"] {
+      width: 100%;
+      padding: 12px 50px 12px 20px;
+      font-size: 18px;
+      border: 2px solid #444;
+      border-radius: 25px;
+      background: #2a2a3b;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.3s ease;
+      letter-spacing: 2px;
+    }
+
+    input[type="password"]:hover, input[type="text"]:hover {
+      border-color: #6a0dad;
+    }
+
+    .eye-icon {
+      position: absolute;
+      top: 50%;
+      right: -45px;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    .eye-svg {
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .pupil {
+      fill: #fff;
+      transition: transform 0.1s ease;
+    }
+
+    .hidden-eye {
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .hidden-eye.hidden {
+      opacity: 0;
+    }
+
+    @keyframes reveal {
+      from {
+        letter-spacing: 5px;
+      }
+      to {
+        letter-spacing: 2px;
+      }
+    }
+
+    .animated-reveal {
+      animation: reveal 0.4s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="password-container">
+    <input type="password" id="password" placeholder="Enter your password">
+    <svg
+      class="eye-icon"
+      id="eye"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+    >
+      <g class="eye-group">
+        <path
+          d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"
+          class="eye-svg"
+        ></path>
+        <circle
+          cx="12"
+          cy="12"
+          r="2"
+          class="pupil"
+          id="pupil"
+        ></circle>
+        <path
+          d="M2 2l20 20"
+          class="eye-svg hidden-eye"
+          id="slash"
+        ></path>
+      </g>
+    </svg>
+  </div>
+
+  <script>
+    const eyeIcon = document.getElementById('eye');
+    const passwordField = document.getElementById('password');
+    const slash = document.getElementById('slash');
+    const pupil = document.getElementById('pupil');
+    const passwordContainer = document.querySelector('.password-container');
+
+    let isPasswordVisible = false;
+
+    eyeIcon.addEventListener('click', () => {
+      if (passwordField.value.length > 0) {
+        if (!isPasswordVisible) {
+          passwordField.type = 'text';
+          passwordField.classList.add('animated-reveal'); 
+          slash.classList.add('hidden'); 
+          isPasswordVisible = true;
+
+          setTimeout(() => {
+            passwordField.classList.remove('animated-reveal'); 
+          }, 400);
+        } else {
+          passwordField.type = 'password';
+          slash.classList.remove('hidden');
+          isPasswordVisible = false;
+        }
+      }
+    });
+
+    passwordField.addEventListener('input', () => {
+      if (passwordField.value.length === 0) {
+        slash.classList.remove('hidden');
+        isPasswordVisible = false; 
+        passwordField.type = 'password'; 
+      }
+    });
+
+    passwordContainer.addEventListener('mousemove', (e) => {
+      if (passwordField.value.length > 0) {
+        const rect = passwordContainer.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 2 - 1; 
+        const y = ((e.clientY - rect.top) / rect.height) * 2 - 1; 
+        pupil.style.transform = `translate(${x * 5}px, ${y * 5}px)`; 
+      }
+    });
+
+    passwordContainer.addEventListener('mouseleave', () => {
+      pupil.style.transform = 'translate(0, 0)';
+    });
+  </script>
+</body>
+</html>
